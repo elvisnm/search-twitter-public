@@ -1,0 +1,23 @@
+<div class="search-form container">
+	<h2>search for tweets by keyword</h2>
+	<%= form_tag '/search', :method => :get, :remote => true do %>
+		<fieldset>
+			<div class="input-append">
+				<input type="text" class="span4 q" name="q" id="appendedInputButton"></input>
+				<button type="submit" class="btn">Go</button>
+			</div>
+		</fieldset>
+	<% end %>
+</div>
+<hr>
+
+<div id="results span9">
+	<h4>Tweets</h3>
+	<div id="tweets"></div>
+	<hr>
+	<h4>Hashtags</h3>
+	<div id="hashtags"></div>
+	<hr>
+	<h4>Users</h3>
+	<div id="users"></div>
+</div>

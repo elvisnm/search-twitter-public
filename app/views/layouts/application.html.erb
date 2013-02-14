@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>SearchTwitter</title>
+  <%= stylesheet_link_tag    "application", :media => "all" %>
+  <%= javascript_include_tag "application" %>
+  <script src="http://js.pusher.com/1.12/pusher.min.js"></script>
+	<script src="https://raw.github.com/leggetter/pusher-js-helper/master/helper.js"></script>
+  <%= csrf_meta_tags %>
+</head>
+<body>
+
+<div class="navbar navbar-inverse navbar-fixed-top">
+  <div class="navbar-inner">
+    <div class="container">
+      <a class="brand" href="/">Search Twitter</a>
+    </div>
+  </div>
+</div>
+<div class="container">
+	<%= yield %>
+
+	<hr>
+	<footer><%= link_to "{codelinexperts}", "http://www.codelinexperts.com", :target => "_blank" %> - 
+					<%= link_to "@elvisnm", "http://twitter.com/elvisnm", :target => "_blank" %></footer>
+</div>
+
+
+<script>
+	$(document).ready(function(){
+		var pusher = new Pusher('c8321b7aa8388948f5b0');
+		var channel = pusher.subscribe('twitter-results');
+
+		$('form').submit(function(e){
+			var q = $('input.q').val()
+			$('input.q').val("");
+
+			$.ajax({
+	      type: 'GET',
+	      url: '/search',
+	      data: { q: q },
+	      dataType: 'html',
+	      success: function(){}
+	  	});
+	  	return false;
+		});
+
+		channel.bind('tweets', function(data) {
+			var q = data.q;
+			var label = $('<span class="label label-inverse">'+q+'</span>');
+			var ul = $('<ul class="unstyled">');
+			$.each(JSON.parse(data.result), function(i, item) {
+				ul.append("<li><strong>@"+item.user+":</strong> "+item.status+"</li>");
+			});
+			$('#tweets').prepend(label, ul);
+		});
+		channel.bind('hashtags', function(data) {
+			var q = data.q;
+			$('#hashtags').append('<span class="label label-inverse">'+q+'</span>');
+			var ul = $('<ul class="unstyled">');
+			$.each(JSON.parse(data.result), function(i, item) {
+				ul.append("<li><strong>@"+item.user+":</strong> "+item.status+"</li>");
+			});
+			$('#hashtags').append(ul);
+		});
+		channel.bind('users', function(data) {
+			var q = data.q;
+			$('#users').append('<span class="label label-inverse">'+q+'</span>');
+			var ul = $('<ul class="unstyled">');
+			$.each(JSON.parse(data.result), function(i, item) {
+				ul.append("<li><strong>@"+item.user+":</strong> "+item.description+"</li>");
+			});
+			$('#users').append(ul);
+		});
+
+	});
+</script>
+</body>
+</html>
